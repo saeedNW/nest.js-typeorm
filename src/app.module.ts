@@ -21,7 +21,7 @@ import { UserModule } from './user/user.module';
 			database: "typeorm",
 			autoLoadEntities: true,
 			entities: [],
-			synchronize: true,
+			synchronize: true,	//? Don't set this value to true in production. Data Lost Warning
 		}),
 		UserModule,
 	],
