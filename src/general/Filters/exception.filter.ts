@@ -6,6 +6,8 @@ import {
 } from "@nestjs/common";
 import { Response } from "express";
 
+//? Implementing custom response logic for exceptions.
+
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
 	catch(exception: HttpException, host: ArgumentsHost) {

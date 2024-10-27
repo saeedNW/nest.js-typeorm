@@ -1,9 +1,10 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserModule } from "./user/user.module";
-import { APP_FILTER, APP_PIPE } from "@nestjs/core";
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { HttpExceptionFilter } from "./general/Filters/exception.filter";
 import { ValidationPipe422 } from "./general/pipe/validation.pipe";
+import { TransformerInterceptor } from "./general/interceptor/transformer.interceptor";
 
 @Module({
 	imports: [
@@ -37,6 +38,10 @@ import { ValidationPipe422 } from "./general/pipe/validation.pipe";
 		{
 			provide: APP_PIPE,
 			useClass: ValidationPipe422,
+		},
+		{
+			provide: APP_INTERCEPTOR,
+			useClass: TransformerInterceptor,
 		},
 	],
 })
