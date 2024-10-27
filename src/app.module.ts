@@ -1,6 +1,9 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { UserModule } from './user/user.module';
+import { UserModule } from "./user/user.module";
+import { APP_FILTER, APP_PIPE } from "@nestjs/core";
+import { HttpExceptionFilter } from "./general/Filters/exception.filter";
+import { ValidationPipe422 } from "./general/pipe/validation.pipe";
 
 @Module({
 	imports: [
@@ -21,11 +24,20 @@ import { UserModule } from './user/user.module';
 			database: "typeorm",
 			autoLoadEntities: true,
 			entities: [],
-			synchronize: true,	//? Don't set this value to true in production. Data Lost Warning
+			synchronize: true, //? Don't set this value to true in production. Data Lost Warning
 		}),
 		UserModule,
 	],
 	controllers: [],
-	providers: [],
+	providers: [
+		{
+			provide: APP_FILTER,
+			useClass: HttpExceptionFilter,
+		},
+		{
+			provide: APP_PIPE,
+			useClass: ValidationPipe422,
+		},
+	],
 })
 export class AppModule {}
