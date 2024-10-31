@@ -5,6 +5,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { HttpExceptionFilter } from "./general/Filters/exception.filter";
 import { ValidationPipe422 } from "./general/pipe/validation.pipe";
 import { TransformerInterceptor } from "./general/interceptor/transformer.interceptor";
+import { BlogModule } from './blog/blog.module';
 
 @Module({
 	imports: [
@@ -28,6 +29,7 @@ import { TransformerInterceptor } from "./general/interceptor/transformer.interc
 			synchronize: true, //? Don't set this value to true in production. Data Lost Warning
 		}),
 		UserModule,
+		BlogModule,
 	],
 	controllers: [],
 	providers: [

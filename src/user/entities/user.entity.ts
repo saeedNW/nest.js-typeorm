@@ -1,7 +1,9 @@
+import { BlogEntity } from "src/blog/entities/blog.entity";
 import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	OneToMany,
 	PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -19,4 +21,6 @@ export class UserEntity {
 	age: number;
 	@CreateDateColumn()
 	createdAt: Date;
+	@OneToMany(() => BlogEntity, (blog) => blog.user)
+	blogs: BlogEntity[];
 }

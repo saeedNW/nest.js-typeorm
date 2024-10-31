@@ -54,6 +54,20 @@ export class UserService {
 		return await this.userRepository.find({});
 	}
 
+	async blogsOfUser(userId: number) {
+		//? Retrieve all users data and use relation to get each user's blogs data.
+		//? Relations in typeorm use SQL joins to joni tables data and retrieve
+		//? a joined data.
+		return await this.userRepository.findOne({
+			where: {
+				id: userId,
+			},
+			relations: {
+				blogs: true,
+			},
+		});
+	}
+
 	async search(search: string) {
 		//? `where: FindOptionsWhere<UserEntity> = {}` — Initializes the `where` object, which will hold search
 		//? criteria if any are specified. This object is later used to filter results in the query.

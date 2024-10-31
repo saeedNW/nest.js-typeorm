@@ -97,6 +97,11 @@ export class UserController {
 		return this.userService.findOne(id);
 	}
 
+	@Get("blogs/:userId")
+	blogs(@Param("userId", ParseIntPipe) userId: number) {
+		return this.userService.blogsOfUser(userId);
+	}
+
 	@Patch(":id")
 	update(
 		@Param("id", ParseIntPipe) id: number,
