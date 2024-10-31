@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -14,6 +18,8 @@ import {
 	MoreThanOrEqual,
 	Repository,
 } from "typeorm";
+import { CreateProfileDto } from "./dto/create-profile.dto";
+import { ProfileEntity } from "./entities/profile.entity";
 
 @Injectable()
 export class UserService {
@@ -21,7 +27,10 @@ export class UserService {
 		//? In order to be able to use an entity in a module's service, you need to add
 		//? the entity to that service's constructor by using 'InjectRepository' decorator
 		//? and define it as a private variable.
-		@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>
+		@InjectRepository(UserEntity)
+		private userRepository: Repository<UserEntity>,
+		@InjectRepository(ProfileEntity)
+		private profileRepository: Repository<ProfileEntity>
 	) {}
 
 	async create(createUserDto: CreateUserDto) {
@@ -115,8 +124,10 @@ export class UserService {
 			where["firstName"] = ILike(search);
 		}
 
-		//? `createQueryBuilder("user")` — Creates a query builder instance named "user" for constructing the
-		//? SQL query. Query builders allow complex SQL-like operations such as filtering, ordering, and pagination.
+		//? The `createQueryBuilder` method in TypeORM provides a flexible and powerful way to build custom SQL queries
+		//? directly within your repository or service. This approach is useful when working with complex queries
+		//? involving joins, subqueries, or conditions that are not easily achievable with TypeORM’s standard methods
+		//? like `find()`.
 		const queryBuilder = this.userRepository
 			.createQueryBuilder("user")
 			.where(where)
@@ -148,7 +159,7 @@ export class UserService {
 	}
 
 	async update(id: number, updateUserDto: UpdateUserDto) {
-		const user = await this.findOne(id);
+		await this.findOne(id);
 
 		await this.userRepository.update({ id }, updateUserDto);
 
@@ -183,5 +194,44 @@ export class UserService {
 		await this.userRepository.delete({ id });
 
 		return `User has been removed`;
+	}
+
+	async createProfile(profileDto: CreateProfileDto) {
+		const { bio, photo, userId } = profileDto;
+
+		const user = await this.findOne(userId);
+
+		const profile = await this.profileRepository.findOneBy({ userId });
+
+		if (profile) {
+			if (bio) profile.bio = bio;
+			if (photo) profile.photo = photo;
+			await this.profileRepository.save(profile);
+		} else {
+			let newProfile = this.profileRepository.create({
+				bio,
+				photo,
+				userId,
+			});
+			newProfile = await this.profileRepository.save(newProfile);
+			user.profileId = newProfile.id;
+			await this.userRepository.save(user);
+		}
+
+		return "Profile updated successfully";
+	}
+
+	async getProfile(userId: number) {
+		const user = await this.userRepository
+			.createQueryBuilder("user")
+			.where({ id: userId })
+			.leftJoinAndSelect("user.profile", "profile")
+			.getOne();
+
+		if (!user) {
+			throw new NotFoundException("User was not found");
+		}
+
+		return user;
 	}
 }

@@ -16,6 +16,7 @@ import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { plainToClass } from "class-transformer";
+import { CreateProfileDto } from "./dto/create-profile.dto";
 
 @Controller("user")
 export class UserController {
@@ -134,5 +135,15 @@ export class UserController {
 	@Delete("/delete/:id")
 	delete(@Param("id", ParseIntPipe) id: number) {
 		return this.userService.delete(id);
+	}
+
+	@Post("profile")
+	createProfile(@Body() createProfileDto: CreateProfileDto) {
+		return this.userService.createProfile(createProfileDto);
+	}
+
+	@Get("profile/:userId")
+	getProfile(@Param("userId", ParseIntPipe) userId: number) {
+		return this.userService.getProfile(userId);
 	}
 }
